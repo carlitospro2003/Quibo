@@ -3,6 +3,13 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
+
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\EncryptionController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -28,3 +35,15 @@ Route::group([
         Route::get('/user',    [AuthController::class, 'getAuthenticatedUser']);
     });
 });
+
+// Ruta para registrar un nuevo usuario
+Route::post('/register', [RegisterController::class, 'register']);
+
+// Ruta para iniciar sesión
+Route::post('/login', [LoginController::class, 'login']);
+
+// Ruta para cifrar el mensaje
+Route::post('/encrypt-message', [EncryptionController::class, 'encryptMessage']);
+
+// Ruta para descifrar el mensaje
+Route::post('/decrypt-message', [EncryptionController::class, 'decryptMessage']);
