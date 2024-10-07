@@ -47,3 +47,14 @@ Route::post('/encrypt-message', [EncryptionController::class, 'encryptMessage'])
 
 // Ruta para descifrar el mensaje
 Route::post('/decrypt-message', [EncryptionController::class, 'decryptMessage']);
+
+Route::prefix('message')->group(function () {
+    
+    //Obtiene mensajes
+    Route::get('get-messages', [MessageController::class, 'getMessages']);
+    //Middleware de auth
+    Route::middleware(['auth:sanctum', 'activeaccount'])->group(function () {
+        //Sube mensaje encriptado a mongodb   
+        Route::post('post-message', [MessageController::class, 'postMessage']);
+    });
+});
