@@ -38,30 +38,30 @@ class MessageController extends Controller
 
     // Obtener datos de MongoDB Durann23
     public function getMessages()
-{
-    try {
-        // Obtener todos los mensajes de la colección de MongoDB
-        $mensajes = Chat::orderBy('fecha', 'asc')->get();
+    {
+        try {
+            // Obtener todos los mensajes de la colección de MongoDB
+            $mensajes = Chat::orderBy('fecha', 'asc')->get();
 
-        // Desencriptar los mensajes
-        $mensajesDesencriptados = $mensajes->map(function($mensaje) {
-        
-            // Desencriptar el campo message
-            $mensaje->message = Crypt::decryptString($mensaje->message);
-            $mensaje->makeHidden(['created_at', 'updated_at']);
-            return $mensaje; // Retornar el mensaje con el campo desencriptado
-        });
+            // Desencriptar los mensajes
+            $mensajesDesencriptados = $mensajes->map(function ($mensaje) {
 
-        // Retornar los mensajes en formato JSON
-        return response()->json([
-            'result' => true,
-            'msg' => "Mensajes obtenidos.",
-            'data' => $mensajesDesencriptados
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Error al obtener los mensajes: ' . $e->getMessage()], 500);
+                // Desencriptar el campo message
+                $mensaje->message = Crypt::decryptString($mensaje->message);
+                $mensaje->makeHidden(['created_at', 'updated_at']);
+                return $mensaje; // Retornar el mensaje con el campo desencriptado
+            });
+
+            // Retornar los mensajes en formato JSON
+            return response()->json([
+                'result' => true,
+                'msg' => "Mensajes obtenidos.",
+                'data' => $mensajesDesencriptados
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener los mensajes: ' . $e->getMessage()], 500);
+        }
     }
-}
 
     //Subir mensaje
     public function postMessage(Request $request)
@@ -83,13 +83,13 @@ class MessageController extends Controller
         Chat::create([
             'message' => $mensajeEncriptado,
             'usuario_id' => $user->id,
+            'userName'=> $user->name,
             'fecha' => now(),
         ]);
-        
+
         return response()->json([
             'result' => true,
             'msg' => 'Mensaje encriptado y guardado'
         ], 200);
-
     }
 }
