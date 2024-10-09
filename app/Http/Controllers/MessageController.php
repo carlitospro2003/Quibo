@@ -68,7 +68,7 @@ class MessageController extends Controller
             'usuario_id' => $user->id,
             'fecha' => now(),
         ]);
-
+        
         return response()->json([
             'result' => true,
             'msg' => 'Mensaje encriptado y guardado'

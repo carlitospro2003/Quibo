@@ -7,53 +7,78 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Tymon\JWTAuth\Contracts\Providers\JWT;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function __construct()
     {
-        $credenciales = $request->only('email', 'password');
-
-        if (Auth::attempt($credenciales)) {
-            $request->session()->regenerate();
-
-            return response()->json(['mensaje' => 'Inicio de sesión exitoso']);
-        }
-
-        return response()->json(['error' => 'Credenciales incorrectas'], 401);
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
-
+    
     public function register(Request $request)
     {
-        $request->validate([
-            'username' => 'required|string|unique:users',
-            'email'    => 'required|email|unique:users',
-            'password' => 'required|string|min:4|confirmed',
+            $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
         ]);
 
-        $usuario = User::create([
-            'username' => $request->username,
-            'email'    => $request->email,
-            'password' => bcrypt($request->password),
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),  // Encriptamos la contraseña
         ]);
 
-        Auth::login($usuario);
-
-        return response()->json(['mensaje' => 'Registro exitoso']);
+        return response()->json([
+            'message' => 'User registered successfully',
+            'user' => $user
+        ], 201);
     }
 
-    public function logout(Request $request)
+    public function login()
     {
-        Auth::logout();
+        $credentials = request(['email', 'password']);
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        if (! $token = auth()->attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
-        return response()->json(['mensaje' => 'Sesión cerrada']);
+        return $this->respondWithToken($token);
     }
 
-    public function getAuthenticatedUser(Request $request)
+    public function me()
     {
-        return response()->json($request->user());
+        return response()->json(auth()->user());
     }
+
+    public function logout()
+    {
+        auth()->logout();
+
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    public function refresh()
+    {
+        return $this->respondWithToken(JWTAuth::refresh());
+    }
+
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 60
+        ]);
+    }
+
+    
 }

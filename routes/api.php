@@ -25,28 +25,22 @@ hola
 Route::get('/', function (Request $request) {
     return (object)['Hello'=>'World'];
 });
+
 Route::group([
     'prefix' => 'auth'
-], function () {
+], function ($router) {
     Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login',    [AuthController::class, 'login']);
-    Route::middleware('auth')->group(function () {
-        Route::post('/logout', [AuthController::class, 'logout']);
-        Route::get('/user',    [AuthController::class, 'getAuthenticatedUser']);
-    });
+    Route::post('/login', [AuthController::class, 'login']);
 });
 
-// Ruta para registrar un nuevo usuario
-Route::post('/register', [RegisterController::class, 'register']);
+Route::group([
+    'middleware' => ['api'],
+    'prefix' => 'user'
+], function ($router) {
+    Route::get('me', [AuthController::class, 'me']);
+    Route::post('logout', [AuthController::class, 'logout']);
+});
 
-// Ruta para iniciar sesión
-Route::post('/login', [LoginController::class, 'login']);
-
-// Ruta para cifrar el mensaje
-Route::post('/encrypt-message', [EncryptionController::class, 'encryptMessage']);
-
-// Ruta para descifrar el mensaje
-Route::post('/decrypt-message', [EncryptionController::class, 'decryptMessage']);
 
 Route::prefix('message')->group(function () {
     

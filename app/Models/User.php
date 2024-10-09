@@ -3,20 +3,19 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Notifications\Notifiable;
 use MongoDB\Laravel\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Tymon\JWTAuth\Contracts\Providers\JWT;
 
-class User extends Model implements AuthenticatableContract
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class User extends Authenticatable implements JWTSubject
 {
-    use Authenticatable, Notifiable;
-
-    protected $connection = 'mongodb';
-    protected string $collection = 'users';
-
+    use Notifiable;
     protected $fillable = [
-        'username',
+        'name',
         'email',
         'password',
     ];
@@ -35,4 +34,12 @@ class User extends Model implements AuthenticatableContract
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    public function getJWTIdentifier()
+    {
+        return $this->getKey(); // Devuelve el identificador único del usuario, generalmente el id
+    }
+    public function getJWTCustomClaims()
+    {
+        return []; // Aquí puedes añadir datos personalizados al payload del token si es necesario
+    }
 }
