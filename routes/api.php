@@ -43,12 +43,8 @@ Route::group([
 
 
 Route::prefix('message')->group(function () {
-    
     //Obtiene mensajes
     Route::get('get-messages', [MessageController::class, 'getMessages']);
-    //Middleware de auth
-    Route::middleware(['auth:sanctum', 'activeaccount'])->group(function () {
-        //Sube mensaje encriptado a mongodb   
-        Route::post('post-message', [MessageController::class, 'postMessage']);
-    });
+    //Sube mensaje
+    Route::post('post-message', [MessageController::class, 'postMessage']);
 });

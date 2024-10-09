@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Chat;
+use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
 
@@ -37,16 +38,33 @@ class MessageController extends Controller
 
     // Obtener datos de MongoDB Durann23
     public function getMessages()
-    {
+{
+    try {
+        // Obtener todos los mensajes de la colección de MongoDB
         $mensajes = Chat::orderBy('fecha', 'asc')->get();
+
+        // Desencriptar los mensajes
         $mensajesDesencriptados = $mensajes->map(function($mensaje) {
-            $mensaje->mensajencriptado = Crypt::decryptString($mensaje->mensajencriptado);
-            return $mensaje;
+        
+            // Desencriptar el campo message
+            $mensaje->message = Crypt::decryptString($mensaje->message);
+            $mensaje->makeHidden(['created_at', 'updated_at']);
+            return $mensaje; // Retornar el mensaje con el campo desencriptado
         });
-        return response()->json($mensajesDesencriptados);    
+
+        // Retornar los mensajes en formato JSON
+        return response()->json([
+            'result' => true,
+            'msg' => "Mensajes obtenidos.",
+            'data' => $mensajesDesencriptados
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al obtener los mensajes: ' . $e->getMessage()], 500);
     }
+}
+
     //Subir mensaje
-    public function postMessage($request)
+    public function postMessage(Request $request)
     {
         $validador = Validator::make($request->all(), [
             "message" => "required|string",
@@ -61,10 +79,9 @@ class MessageController extends Controller
         $mensaje = $request->message;
         // Encriptar el mensaje antes de guardarlo
         $mensajeEncriptado = Crypt::encryptString($mensaje);
-        $user = Auth::user();
-        // Guardar el mensaje en MongoDB
+        $user = User::find($request->id);
         Chat::create([
-            'mensajencriptado' => $mensajeEncriptado,
+            'message' => $mensajeEncriptado,
             'usuario_id' => $user->id,
             'fecha' => now(),
         ]);
