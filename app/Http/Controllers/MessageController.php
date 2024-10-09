@@ -79,7 +79,7 @@ class MessageController extends Controller
         $mensaje = $request->message;
         // Encriptar el mensaje antes de guardarlo
         $mensajeEncriptado = Crypt::encryptString($mensaje);
-        $user = User::find($request->id);
+        $user = auth()->user();
         Chat::create([
             'message' => $mensajeEncriptado,
             'usuario_id' => $user->id,
