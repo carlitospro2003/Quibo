@@ -2,29 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use MongoDB\Laravel\Eloquent\Model;
 
-class Chat extends Model
+class Chat extends Model 
 {
-    use HasFactory;
+    use Notifiable;
+
+    protected $connection = 'mongodb';
+    protected $collection = 'chats';
 
     protected $fillable = [
-        'name',
+        'message',
+        'usuario_id',
+        'fecha',
     ];
-
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'chat_user')->withTimestamps();
-    }
 }
-/*
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
-
-class Mensaje extends Eloquent
-{
-    protected $connection = 'mongodb'; // Define que este modelo usa MongoDB
-    protected $collection = 'mensajes'; // El nombre de tu colección
-}
-
-*\

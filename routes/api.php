@@ -3,8 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\LoginController;
 
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\EncryptionController;
@@ -49,12 +49,8 @@ Route::post('/encrypt-message', [EncryptionController::class, 'encryptMessage'])
 Route::post('/decrypt-message', [EncryptionController::class, 'decryptMessage']);
 
 Route::prefix('message')->group(function () {
-    
     //Obtiene mensajes
     Route::get('get-messages', [MessageController::class, 'getMessages']);
-    //Middleware de auth
-    Route::middleware(['auth:sanctum', 'activeaccount'])->group(function () {
-        //Sube mensaje encriptado a mongodb   
-        Route::post('post-message', [MessageController::class, 'postMessage']);
-    });
+    //Sube mensaje
+    Route::post('post-message', [MessageController::class, 'postMessage']);
 });
