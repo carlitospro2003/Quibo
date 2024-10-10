@@ -17,5 +17,6 @@ class Chat extends Model
         'usuario_id',
         'userName',
         'fecha',
+        'time'
     ];
 }

@@ -8,6 +8,7 @@ use App\Models\Chat;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class MessageController extends Controller
 {
@@ -85,6 +86,8 @@ class MessageController extends Controller
             'usuario_id' => $user->id,
             'userName'=> $user->name,
             'fecha' => now(),
+            'time' => Carbon::now('America/Monterrey')->format('g:i A'), // Hora y minutos en formato 12h con AM/PM
+
         ]);
 
         return response()->json([
