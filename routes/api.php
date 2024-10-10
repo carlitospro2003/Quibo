@@ -43,8 +43,10 @@ Route::group([
 
 
 Route::prefix('message')->group(function () {
-    //Obtiene mensajes
-    Route::get('get-messages', [MessageController::class, 'getMessages']);
-    //Sube mensaje
-    Route::post('post-message', [MessageController::class, 'postMessage']);
+    Route::middleware(['jwt.verify'])->group(function () {
+        //Obtiene mensajes
+        Route::get('get-messages', [MessageController::class, 'getMessages']);
+        //Sube mensaje
+        Route::post('post-message', [MessageController::class, 'postMessage']);
+    });
 });
