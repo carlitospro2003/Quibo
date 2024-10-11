@@ -36,7 +36,20 @@ class MessageController extends Controller
             'encrypted_message' => $encryptedMessage,
         ], 200);
     }
-
+    function reverseStringHalves($string) {
+        // Obtener la longitud del string
+        $length = strlen($string);
+    
+        // Calcular la mitad
+        $half = intval($length / 2);
+    
+        // Dividir el string en dos mitades
+        $firstHalf = substr($string, 0, $half);
+        $secondHalf = substr($string, $half);
+    
+        // Invertir las mitades
+        return $secondHalf . $firstHalf;
+    }
     // Obtener datos de MongoDB Durann23
     public function getMessages()
     {
@@ -48,7 +61,7 @@ class MessageController extends Controller
             $mensajesDesencriptados = $mensajes->map(function ($mensaje) {
 
                 // Desencriptar el campo message
-                $mensaje->message = Crypt::decryptString($mensaje->message);
+                $mensaje->message = Crypt::decryptString($this->reverseStringHalves($mensaje->message));
                 $mensaje->makeHidden(['created_at', 'updated_at']);
                 return $mensaje; // Retornar el mensaje con el campo desencriptado
             });
@@ -80,9 +93,10 @@ class MessageController extends Controller
         $mensaje = $request->message;
         // Encriptar el mensaje antes de guardarlo
         $mensajeEncriptado = Crypt::encryptString($mensaje);
+        $messageinvert = $this->reverseStringHalves($mensajeEncriptado);
         $user = auth()->user();
         Chat::create([
-            'message' => $mensajeEncriptado,
+            'message' => $messageinvert,
             'usuario_id' => $user->id,
             'userName'=> $user->name,
             'fecha' => now(),
