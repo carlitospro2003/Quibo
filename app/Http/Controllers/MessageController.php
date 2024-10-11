@@ -42,13 +42,13 @@ class MessageController extends Controller
     
         // Calcular la mitad
         $half = intval($length / 2);
-    
+    //hola laho ohal
+    //ohal aloh hola
         // Dividir el string en dos mitades
         $firstHalf = substr($string, 0, $half);
         $secondHalf = substr($string, $half);
-    
         // Invertir las mitades
-        return $secondHalf . $firstHalf;
+        return strrev($secondHalf . $firstHalf);
     }
     // Obtener datos de MongoDB Durann23
     public function getMessages()
