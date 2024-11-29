@@ -10,6 +10,7 @@
         "jenssegers/mongodb": "*",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
+        "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.8",
         "mongodb/laravel-mongodb": "^5.0",
         "pusher/pusher-php-server": "^7.2",
