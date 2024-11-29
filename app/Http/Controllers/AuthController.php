@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Contracts\Providers\JWT;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
@@ -18,7 +19,7 @@ class AuthController extends Controller
     {
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
-    
+
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -67,7 +68,7 @@ class AuthController extends Controller
                     'result' => true,
                     'msg' => "Inicio de sesión exitoso.",
                     'access_token' => $token,
-                ], 200);            
+                ], 200);
             }
             return response()->json([
                 'result' => false,
@@ -106,5 +107,33 @@ class AuthController extends Controller
         ]);
     }
 
-    
+    // Redirige al usuario a la página de Google
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+    // Maneja el callback de Google
+    public function handleGoogleCallback()
+    {
+        try {
+            $user = Socialite::driver('google')->user();
+            try{
+                $userNuevo = new User();
+                $userNuevo->name = $user->name;
+                $userNuevo->email = $user->email;
+                $userNuevo->password = "contraseñaSegura";
+                $userNuevo->save();
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+            }
+            return response()->json([
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar' => $user->avatar,
+            ]);
+        } catch (\Exception $e) {
+            return redirect('/')->with('error', 'Algo salió mal.');
+        }
+    }
+
 }
