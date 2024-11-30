@@ -31,8 +31,6 @@ Route::group([
 ], function ($router) {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-    Route::get('/google', [AuthController::class, 'redirectToGoogle']);
-    Route::get('/callback', [AuthController::class, 'handleGoogleCallback']);
 });
 
 Route::group([
